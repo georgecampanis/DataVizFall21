@@ -7,21 +7,21 @@ library(here)
 library(gapminder)
 
 
-<#
 
-Basic Plot Examples: 
 
-1. Histograms/Bar Charts
-2. Kernel Density Plots
-3. Line Charts
-4. Pie Charts
-5. Dot Plots
-6. BoxPlots
-7. Scatterplots
-8.....
+# Basic Plot Examples: 
 
-Reference: https://ggplot2.tidyverse.org/reference/
-#>
+# 1. Histograms/Bar Charts
+# 2. Kernel Density Plots
+# 3. Line Charts
+# 4. Pie Charts
+# 5. Scatter Plots
+# 6. BoxPlots
+# 7.....
+
+# References: 
+# https://ggplot2.tidyverse.org/reference/
+# https://www.statmethods.net/graphs/index.html
 ###################################
 #       Histograms/Bar Charts
 ###################################
@@ -33,7 +33,8 @@ ggplot(mpg) + geom_bar(aes(y = class))
 d <- density(mtcars$mpg) # returns the density data
 plot(d) # plots the results
 
-ggplot(diamonds, aes(carat)) +  geom_density()
+ggplot(diamonds, aes(carat)) 
++  geom_density()
 ###################################
 #       Line Charts
 ###################################
@@ -46,21 +47,32 @@ ggplot(data=df, aes(x=dose, y=len, group=1)) +  geom_line()+  geom_point()
 ###################################
 #       Pie Charts
 ###################################
+slices <- c(10, 12,4, 16, 8)
+lbls <- c("US", "UK", "Australia", "Germany", "France")
+pie(slices, labels = lbls, main="Pie Chart of Countries")
 
+#' # A pie chart = stacked bar chart + polar coordinates
+pie <- ggplot(mtcars, aes(x = factor(1), fill = factor(cyl))) +
+ geom_bar(width = 1)
+pie + coord_polar(theta = "y")
+###################################
+#       Scatter Plots
+###################################
+#attach(mtcars)
+plot(wt, mpg, main="Scatterplot Example",
+   xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
 
+p <- ggplot(mtcars, aes(wt, mpg))
+p + geom_point()
+###################################
+#       Box and Whisker Plots
+###################################
+# Boxplot of MPG by Car Cylinders
+boxplot(mpg~cyl,data=mtcars, main="Car Milage Data",
+   xlab="Number of Cylinders", ylab="Miles Per Gallon")
 
-5. Dot Plots
-6. BoxPlots
-7. Scatterplots
-
-
-
-
-
-
-
-
-
+ggplot(mpg, aes(hwy, class)) + geom_boxplot() # Tukey Style => Read more here: https://en.wikipedia.org/wiki/Box_plot
+##################################################################
 gapminder
 
 # Examples https://www.oreilly.com/library/view/r-for-data/9781491910382/ch01.html
