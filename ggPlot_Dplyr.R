@@ -6,6 +6,61 @@ library(socviz)
 library(here)
 library(gapminder)
 
+
+<#
+
+Basic Plot Examples: 
+
+1. Histograms/Bar Charts
+2. Kernel Density Plots
+3. Line Charts
+4. Pie Charts
+5. Dot Plots
+6. BoxPlots
+7. Scatterplots
+8.....
+
+Reference: https://ggplot2.tidyverse.org/reference/
+#>
+###################################
+#       Histograms/Bar Charts
+###################################
+hist(mtcars$mpg)
+ggplot(mpg) + geom_bar(aes(y = class))
+###################################
+#       Kernel Density Plots
+###################################
+d <- density(mtcars$mpg) # returns the density data
+plot(d) # plots the results
+
+ggplot(diamonds, aes(carat)) +  geom_density()
+###################################
+#       Line Charts
+###################################
+v <- c(7,12,28,3,41)
+plot(v,type = "o")
+
+#ToothGrowth describes the effect of Vitamin C on tooth growth in Guinea pigs.
+ggplot(data=df, aes(x=dose, y=len, group=1)) +  geom_line()+  geom_point()
+
+###################################
+#       Pie Charts
+###################################
+
+
+
+5. Dot Plots
+6. BoxPlots
+7. Scatterplots
+
+
+
+
+
+
+
+
+
 gapminder
 
 # Examples https://www.oreilly.com/library/view/r-for-data/9781491910382/ch01.html
@@ -242,7 +297,7 @@ p <- ggplot(data = gss_sm,
             mapping = aes(x = bigregion, fill = religion))
 p + geom_bar()
 #****************************
-#*Start HERE=>
+#*
 #*
 #*
 p <- ggplot(data = gss_sm,
@@ -275,7 +330,10 @@ p + geom_histogram()
 
 ################################
 ## `stat_bin()` using `bins = 30`. Pick better value with
-## `binwidth`. rule of thumb.
+## `binwidth`. rule of thumb. Sturge’s rule => K = 1 + 3.322 logN :> K=# bins and N = #observations e.g. N=55 => K = 1 + 3.322 log(55) = 6.781 ≅ 7
+# Sturge’s rule Not good for severly skewed data
+# For alternatives read: https://en.wikipedia.org/wiki/Histogram#Number_of_bins_and_width
+
 p <- ggplot(data = midwest,
             mapping = aes(x = area))
 p + geom_histogram(bins = 10)
@@ -300,6 +358,26 @@ p + geom_histogram(alpha = 0.4, bins = 20)
 # kernel density
 # https://vita.had.co.nz/papers/density-estimation.pdf
 
+# Example
+
+# Compare MPG distributions for cars with
+# 4,6, or 8 cylinders
+library(sm)
+attach(mtcars)
+
+# create value labels
+cyl.f <- factor(cyl, levels= c(4,6,8),
+  labels = c("4 cylinder", "6 cylinder", "8 cylinder"))
+
+# plot densities
+sm.density.compare(mpg, cyl, xlab="Miles Per Gallon")
+title(main="MPG Distribution by Car Cylinders")
+
+# add legend via mouse click
+colfill<-c(2:(2+length(levels(cyl.f))))
+legend(locator(1), levels(cyl.f), fill=colfill)
+# https://www.statmethods.net/graphs/density.html
+#########
 p <- ggplot(data = midwest,
             mapping = aes(x = area))
 p + geom_density()
@@ -534,13 +612,6 @@ named_dests
 flights_weather_joined <- flights %>%
   inner_join(weather, by = c("year", "month", "day", "hour", "origin"))
 View(flights_weather_joined)
-
-
-
-
-
-
-####===>Start Here
 
 
 
