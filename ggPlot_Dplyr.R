@@ -72,6 +72,11 @@ boxplot(mpg~cyl,data=mtcars, main="Car Milage Data",
    xlab="Number of Cylinders", ylab="Miles Per Gallon")
 
 ggplot(mpg, aes(hwy, class)) + geom_boxplot() # Tukey Style => Read more here: https://en.wikipedia.org/wiki/Box_plot
+
+##########################################################
+## GGPLOT
+## Ref Healy: https://socviz.co/makeplot.html
+## Run through text e.g. data->mapping->geom->themes
 ##################################################################
 gapminder
 
