@@ -4,8 +4,8 @@ devtools::install_github("kjhealy/socviz")
 library(tidyverse)
 library(socviz)
 library(here)
+library(ggplot2)
 library(gapminder)
-
 
 
 
@@ -26,21 +26,22 @@ library(gapminder)
 #       Histograms/Bar Charts
 ###################################
 hist(mtcars$mpg)
-ggplot(mpg) + geom_bar(aes(y = class))
+ggplot(mpg, aes(class)) + geom_bar()
 ###################################
 #       Kernel Density Plots
 ###################################
 d <- density(mtcars$mpg) # returns the density data
 plot(d) # plots the results
 
-ggplot(diamonds, aes(carat)) 
-+  geom_density()
+ggplot(diamonds, aes(carat)) +  geom_density()
 ###################################
 #       Line Charts
 ###################################
 v <- c(7,12,28,3,41)
 plot(v,type = "o")
 
+df <- data.frame(dose=c("D0.5", "D1", "D2"),
+                 len=c(4.2, 10, 29.5))
 #ToothGrowth describes the effect of Vitamin C on tooth growth in Guinea pigs.
 ggplot(data=df, aes(x=dose, y=len, group=1)) +  geom_line()+  geom_point()
 
@@ -53,25 +54,27 @@ pie(slices, labels = lbls, main="Pie Chart of Countries")
 
 #' # A pie chart = stacked bar chart + polar coordinates
 pie <- ggplot(mtcars, aes(x = factor(1), fill = factor(cyl))) +
- geom_bar(width = 1)
+  geom_bar(width = 1)
 pie + coord_polar(theta = "y")
 ###################################
 #       Scatter Plots
 ###################################
-#attach(mtcars)
+attach(mtcars)
 plot(wt, mpg, main="Scatterplot Example",
-   xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
+     xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
 
-p <- ggplot(mtcars, aes(wt, mpg))
-p + geom_point()
+ggplot(mtcars, aes(wt, mpg)) + geom_point()
 ###################################
 #       Box and Whisker Plots
 ###################################
 # Boxplot of MPG by Car Cylinders
 boxplot(mpg~cyl,data=mtcars, main="Car Milage Data",
-   xlab="Number of Cylinders", ylab="Miles Per Gallon")
+        xlab="Number of Cylinders", ylab="Miles Per Gallon")
 
-ggplot(mpg, aes(hwy, class)) + geom_boxplot() # Tukey Style => Read more here: https://en.wikipedia.org/wiki/Box_plot
+
+p <- ggplot(mpg, aes(class, hwy))
+p + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.2)
+p + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.2)# Tukey Style => Read more here: https://en.wikipedia.org/wiki/Box_plot
 
 ##########################################################
 ## GGPLOT
@@ -131,7 +134,7 @@ p <- ggplot(data = gapminder,
                           y=lifeExp))
 p + geom_point() +
   geom_smooth(method = "gam") +
- scale_y_log10()
+  scale_y_log10()
 
 ###############################################
 # scales::dollar using scales
@@ -318,7 +321,7 @@ p + geom_bar()
 #*
 #*
 p <- ggplot(data = gss_sm,
-mapping = aes(x = bigregion, fill = religion))
+            mapping = aes(x = bigregion, fill = religion))
 p + geom_bar(position = "fill")
 
 ###############################################
@@ -384,7 +387,7 @@ attach(mtcars)
 
 # create value labels
 cyl.f <- factor(cyl, levels= c(4,6,8),
-  labels = c("4 cylinder", "6 cylinder", "8 cylinder"))
+                labels = c("4 cylinder", "6 cylinder", "8 cylinder"))
 
 # plot densities
 sm.density.compare(mpg, cyl, xlab="Miles Per Gallon")
@@ -686,10 +689,10 @@ named_dests  %>%
 ###ICE 5 ANSWER
 # count of flights by Origin filtered >105000 sorted desc
 FlightsByOrigin = flights %>% 
-group_by(origin) %>%# groupby origin
-summarise(num_flights = n()) %>%# cnt flights
-filter(num_flights > 105000) %>%# filterby >105000 
-arrange(desc(num_flights)) # sort desc
+  group_by(origin) %>%# groupby origin
+  summarise(num_flights = n()) %>%# cnt flights
+  filter(num_flights > 105000) %>%# filterby >105000 
+  arrange(desc(num_flights)) # sort desc
 FlightsByOrigin
 
 # Healy Chpter 5 = https://socviz.co/workgeoms.html#workgeoms
@@ -950,5 +953,4 @@ p <- ggplot(data = organdata,
 p + geom_point() +
   labs(x = "Road Deaths",
        y = "Donor Procurement") +
-theme(legend.position = "top")
-
+  theme(legend.position = "top")
