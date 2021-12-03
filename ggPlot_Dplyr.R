@@ -4,8 +4,8 @@ devtools::install_github("kjhealy/socviz")
 library(tidyverse)
 library(socviz)
 library(here)
+library(ggplot2)
 library(gapminder)
-
 
 
 
@@ -26,21 +26,22 @@ library(gapminder)
 #       Histograms/Bar Charts
 ###################################
 hist(mtcars$mpg)
-ggplot(mpg) + geom_bar(aes(y = class))
+ggplot(mpg, aes(class)) + geom_bar()
 ###################################
 #       Kernel Density Plots
 ###################################
 d <- density(mtcars$mpg) # returns the density data
 plot(d) # plots the results
 
-ggplot(diamonds, aes(carat)) 
-+  geom_density()
+ggplot(diamonds, aes(carat)) +  geom_density()
 ###################################
 #       Line Charts
 ###################################
 v <- c(7,12,28,3,41)
 plot(v,type = "o")
 
+df <- data.frame(dose=c("D0.5", "D1", "D2"),
+                 len=c(4.2, 10, 29.5))
 #ToothGrowth describes the effect of Vitamin C on tooth growth in Guinea pigs.
 ggplot(data=df, aes(x=dose, y=len, group=1)) +  geom_line()+  geom_point()
 
@@ -53,25 +54,31 @@ pie(slices, labels = lbls, main="Pie Chart of Countries")
 
 #' # A pie chart = stacked bar chart + polar coordinates
 pie <- ggplot(mtcars, aes(x = factor(1), fill = factor(cyl))) +
- geom_bar(width = 1)
+  geom_bar(width = 1)
 pie + coord_polar(theta = "y")
 ###################################
 #       Scatter Plots
 ###################################
-#attach(mtcars)
+attach(mtcars)
 plot(wt, mpg, main="Scatterplot Example",
-   xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
+     xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
 
-p <- ggplot(mtcars, aes(wt, mpg))
-p + geom_point()
+ggplot(mtcars, aes(wt, mpg)) + geom_point()
 ###################################
 #       Box and Whisker Plots
 ###################################
 # Boxplot of MPG by Car Cylinders
 boxplot(mpg~cyl,data=mtcars, main="Car Milage Data",
-   xlab="Number of Cylinders", ylab="Miles Per Gallon")
+        xlab="Number of Cylinders", ylab="Miles Per Gallon")
 
-ggplot(mpg, aes(hwy, class)) + geom_boxplot() # Tukey Style => Read more here: https://en.wikipedia.org/wiki/Box_plot
+
+p <- ggplot(mpg, aes(class, hwy))
+p + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.2)# Tukey Style => Read more here: https://en.wikipedia.org/wiki/Box_plot
+
+##########################################################
+## GGPLOT
+## Ref Healy: https://socviz.co/makeplot.html
+## Run through text e.g. data->mapping->geom->themes
 ##################################################################
 gapminder
 
@@ -80,7 +87,7 @@ gapminder
 #################################################
 p <- ggplot(data = gapminder)
 
-data=gapminder
+#data=gapminder
 
 p <- ggplot(data = gapminder,
             mapping = aes(x = gdpPercap,
@@ -126,7 +133,7 @@ p <- ggplot(data = gapminder,
                           y=lifeExp))
 p + geom_point() +
   geom_smooth(method = "gam") +
- scale_y_log10()
+  scale_y_log10()
 
 ###############################################
 # scales::dollar using scales
@@ -175,7 +182,7 @@ p + geom_point(alpha = 0.3) +
        caption = "Source: Gapminder.")
 ###############################################
 # 
-
+####<==== START Class Here
 gapminder
 
 p <- ggplot(data = gapminder,
@@ -313,7 +320,7 @@ p + geom_bar()
 #*
 #*
 p <- ggplot(data = gss_sm,
-mapping = aes(x = bigregion, fill = religion))
+            mapping = aes(x = bigregion, fill = religion))
 p + geom_bar(position = "fill")
 
 ###############################################
@@ -379,7 +386,7 @@ attach(mtcars)
 
 # create value labels
 cyl.f <- factor(cyl, levels= c(4,6,8),
-  labels = c("4 cylinder", "6 cylinder", "8 cylinder"))
+                labels = c("4 cylinder", "6 cylinder", "8 cylinder"))
 
 # plot densities
 sm.density.compare(mpg, cyl, xlab="Miles Per Gallon")
@@ -678,272 +685,12 @@ named_dests  %>%
   top_n(n = 10, wt = num_flights) %>% 
   arrange(desc(num_flights))# arrange = sort
 
-###ICE 5 ANSWER
 # count of flights by Origin filtered >105000 sorted desc
 FlightsByOrigin = flights %>% 
-group_by(origin) %>%# groupby origin
-summarise(num_flights = n()) %>%# cnt flights
-filter(num_flights > 105000) %>%# filterby >105000 
-arrange(desc(num_flights)) # sort desc
+  group_by(origin) %>%# groupby origin
+  summarise(num_flights = n()) %>%# cnt flights
+  filter(num_flights > 105000) %>%# filterby >105000 
+  arrange(desc(num_flights)) # sort desc
 FlightsByOrigin
 
-# Healy Chpter 5 = https://socviz.co/workgeoms.html#workgeoms
-library(socviz)
-
-
-rel_by_region <- gss_sm %>%
-  group_by(bigregion, religion) %>%
-  summarize(N = n()) %>%
-  mutate(freq = N / sum(N),
-         pct = round((freq*100), 0), sum=sum(N))
-rel_by_region
-
-
-p <- ggplot(rel_by_region, aes(x = bigregion, y = pct, fill = religion))
-p + geom_col(position = "dodge2") +
-  labs(x = "Region",y = "Percent", fill = "Religion") +
-  theme(legend.position = "top")
-
-# better option as facets
-p <- ggplot(rel_by_region, aes(x = religion, y = pct, fill = religion))
-p + geom_col(position = "dodge2") +
-  labs(x = NULL, y = "Percent", fill = "Religion") +
-  guides(fill = FALSE) + 
-  coord_flip() + 
-  facet_grid(~ bigregion)
-
-#vars by group
-organdata %>% select(1:6) %>% sample_n(size = 10)
-# could use head(organdata)
-
-p <- ggplot(data = organdata,
-            mapping = aes(x = year, y = donors))
-p + geom_point()
-
-
-p <- ggplot(data = organdata,
-            mapping = aes(x = year, y = donors))
-p + geom_line(aes(group = country)) + facet_wrap(~ country)
-
-
-
-p <- ggplot(data = organdata,
-            mapping = aes(x = country, y = donors))#"labls overlap"
-p + geom_boxplot()
-
-#still need to order
-p <- ggplot(data = organdata,
-            mapping = aes(x = country, y = donors))
-p + geom_boxplot() + coord_flip()
-
-
-p <- ggplot(data = organdata,
-            mapping = aes(x = reorder(country, donors, na.rm=TRUE), # by default orders by mean
-                          y = donors))
-p + geom_boxplot() +
-  labs(x=NULL) +
-  coord_flip()
-
-
-
-p <- ggplot(data = organdata,
-            mapping = aes(x = reorder(country, donors, na.rm=TRUE),
-                          y = donors, fill = world))
-p + geom_boxplot() + labs(x=NULL) +
-  coord_flip() + theme(legend.position = "top")
-
-
-
-
-# More on geom point vs geom jitter
-p <- ggplot(data = organdata,
-            mapping = aes(x = reorder(country, donors, na.rm=TRUE),
-                          y = donors, color = world))
-p + geom_point() + labs(x=NULL) +
-  coord_flip() + theme(legend.position = "top")
-
-# jitter
-p <- ggplot(data = organdata,
-            mapping = aes(x = reorder(country, donors, na.rm=TRUE),
-                          y = donors, color = world))
-p + geom_jitter() + labs(x=NULL) +
-  coord_flip() + theme(legend.position = "top")
-
-
-# control amount of jitter using position_jitter() ht, wdth
-p <- ggplot(data = organdata,
-            mapping = aes(x = reorder(country, donors, na.rm=TRUE),
-                          y = donors, color = world))
-p + geom_jitter(position = position_jitter(width=0.15)) +
-  labs(x=NULL) + coord_flip() + theme(legend.position = "top")
-
-##############MORE dplyr
-by_country <- organdata %>% group_by(consent_law, country) %>%
-  summarize(donors_mean= mean(donors, na.rm = TRUE),
-            donors_sd = sd(donors, na.rm = TRUE),
-            gdp_mean = mean(gdp, na.rm = TRUE),
-            health_mean = mean(health, na.rm = TRUE),
-            roads_mean = mean(roads, na.rm = TRUE),
-            cerebvas_mean = mean(cerebvas, na.rm = TRUE))
-
-by_country
-
-#more elegant way to derive mu and sigma
-by_country <- organdata %>% group_by(consent_law, country) %>%
-  summarize_if(is.numeric, funs(mean, sd), na.rm = TRUE) %>%# funs deprecated
-  ungroup()
-
-by_country <- organdata %>% group_by(consent_law, country) %>%
-  summarize_if(is.numeric, list(mean = mean, sd = sd), na.rm = TRUE) %>%
-  ungroup()
-
-
-glimpse(by_country)
-s=by_country%>% select(donors_mean,donors_sd)
-s
-
-#now plot it
-p <- ggplot(data = by_country,
-            mapping = aes(x = donors_mean, y = reorder(country, donors_mean),
-                          color = consent_law))
-p + geom_point(size=3) +
-  labs(x = "Donor Procurement Rate",
-       y = "", color = "Consent Law") +
-  theme(legend.position="top")
-
-# or use facet Cleveland-style dotplot (one pt per cat)
-p <- ggplot(data = by_country,
-            mapping = aes(x = donors_mean,
-                          y = reorder(country, donors_mean)))
-
-p + geom_point(size=3) +
-  facet_wrap(~ consent_law, scales = "free_y", ncol = 1) +
-  labs(x= "Donor Procurement Rate",
-       y= "") 
-
-#include variance or error =>  A dot-and-whisker plot
-p <- ggplot(data = by_country, mapping = aes(x = reorder(country,
-                                                         donors_mean), y = donors_mean))
-
-p + geom_pointrange(mapping = aes(ymin = donors_mean - donors_sd,
-                                  ymax = donors_mean + donors_sd)) +
-  labs(x= "", y= "Donor Procurement Rate") + coord_flip()
-
-
-#plot yext directly
-p <- ggplot(data = by_country,
-            mapping = aes(x = roads_mean, y = donors_mean))
-p + geom_point() + geom_text(mapping = aes(label = country))
-
-
-# use hjust = 0 to ensure labels arent on the dots
-
-p <- ggplot(data = by_country,
-            mapping = aes(x = roads_mean, y = donors_mean))
-
-p + geom_point() + geom_text(mapping = aes(label = country), hjust = 0)
-
-#not great but another option
-library(ggrepel)
-elections_historic %>% select(2:7) 
-
-p_title <- "Presidential Elections: Popular & Electoral College Margins"
-p_subtitle <- "1824-2016"
-p_caption <- "Data for 2016 are provisional."
-x_label <- "Winner's share of Popular Vote"
-y_label <- "Winner's share of Electoral College Votes"
-
-p <- ggplot(elections_historic, aes(x = popular_pct, y = ec_pct,
-                                    label = winner_label))
-
-p + geom_hline(yintercept = 0.5, size = 1.4, color = "gray80") +
-  geom_vline(xintercept = 0.5, size = 1.4, color = "gray80") +
-  geom_point() +
-  geom_text_repel() +
-  scale_x_continuous(labels = scales::percent) +
-  scale_y_continuous(labels = scales::percent) +
-  labs(x = x_label, y = y_label, title = p_title, subtitle = p_subtitle,
-       caption = p_caption)
-
-# Be more selective on the labels
-p <- ggplot(data = by_country,
-            mapping = aes(x = gdp_mean, y = health_mean))
-
-p + geom_point() +
-  geom_text_repel(data = subset(by_country, gdp_mean > 25000),
-                  mapping = aes(label = country))
-###---------------------------
-p <- ggplot(data = by_country,
-            mapping = aes(x = gdp_mean, y = health_mean))
-
-p + geom_point() +
-  geom_text_repel(data = subset(by_country,
-                                gdp_mean > 25000 | health_mean < 1500 |
-                                  country %in% "Belgium"),
-                  mapping = aes(label = country))
-
-###Annotate
-p <- ggplot(data = organdata, mapping = aes(x = roads, y = donors))
-p + geom_point() + annotate(geom = "text", x = 91, y = 33,
-                            label = "A surprisingly high \n recovery rate.",
-                            hjust = 0)
-
-#red box
-p <- ggplot(data = organdata,
-            mapping = aes(x = roads, y = donors))
-p + geom_point() +
-  annotate(geom = "rect", xmin = 125, xmax = 155,
-           ymin = 30, ymax = 35, fill = "red", alpha = 0.2) + 
-  annotate(geom = "text", x = 157, y = 33,
-           label = "A surprisingly high \n recovery rate.", hjust = 0)
-
-# scales, guides, and themes
-p <- ggplot(data = organdata,
-            mapping = aes(x = roads,
-                          y = donors,
-                          color = world))
-p + geom_point()
-
-#transform
-p <- ggplot(data = organdata,
-            mapping = aes(x = roads,
-                          y = donors,
-                          color = world))
-p + geom_point() +
-  scale_x_log10() +
-  scale_y_continuous(breaks = c(5, 15, 25),
-                     labels = c("Five", "Fifteen", "Twenty Five"))
-
-
-## labeling Legend
-p <- ggplot(data = organdata,
-            mapping = aes(x = roads,
-                          y = donors,
-                          color = world))
-p + geom_point() +
-  scale_color_discrete(labels =
-                         c("Corporatist", "Liberal",
-                           "Social Democratic", "Unclassified")) +
-  labs(x = "Road Deaths",
-       y = "Donor Procurement",
-       color = "Welfare State")
-#ReMoving Legend
-p <- ggplot(data = organdata,
-            mapping = aes(x = roads,
-                          y = donors,
-                          color = world))
-p + geom_point() +
-  labs(x = "Road Deaths",
-       y = "Donor Procurement") +
-  guides(color = FALSE)
-
-#moving Legend top
-p <- ggplot(data = organdata,
-            mapping = aes(x = roads,
-                          y = donors,
-                          color = world))
-p + geom_point() +
-  labs(x = "Road Deaths",
-       y = "Donor Procurement") +
-theme(legend.position = "top")
 
